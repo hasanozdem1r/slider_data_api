@@ -1,5 +1,7 @@
 from flask import Flask
 from configparser import ConfigParser
+
+
 # create a ConfigParser class instance
 conf_obj=ConfigParser()
 
