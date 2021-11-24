@@ -48,6 +48,15 @@ def close_connection(connection, db_cursor):
     connection.close()
 
 
+def fetch_data(sql_query:str,data:tuple):
+    connection = mysql_obj.connect()
+    db_cursor = connection.cursor()
+    db_cursor.execute(sql_query, data)
+    query_data=db_cursor.fetchall()
+    return db_cursor,connection,query_data
+
+
+
 # this section has been created testing connection independently
 if __name__=='__main__':
     try:
