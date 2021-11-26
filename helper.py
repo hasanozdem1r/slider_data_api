@@ -18,3 +18,8 @@ def get_application_name() -> str:
     """
     app_name: str = str(request.args.get('app-name'))
     return app_name
+
+def get_add_image_params():
+    app_id = request.args.get('app-id')
+    image_path = request.args.get('image-path')
+    return app_id, image_path
