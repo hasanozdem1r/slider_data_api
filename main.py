@@ -4,7 +4,7 @@ from helper import get_application_name, get_application_id
 from model import fetch_data, close_connection
 
 
-#TODO method documentation
+# TODO method documentation
 # This method will be used to retrieve all applications name for drag and drop
 # GET request to ->  http://localhost:80/apps_api/v1/apps OR http://localhost/apps-api/v1/apps
 @app.route('/apps-api/v1/apps')  # collection
@@ -23,7 +23,8 @@ def retrieve_app_names():
     except Exception as error:
         return f'{error}'
 
-#TODO method documentation
+
+# TODO method documentation
 # This method will be used to retrieve all images path for slider menu
 # GET request to ->  http://localhost:80/apps-api/v1/images?app-id=1
 # http://localhost/apps-api/v1/images?app-id=51
@@ -50,7 +51,8 @@ def retrieve_images():
     except Exception as error:
         return f'{error}'
 
-#TODO method documentation
+
+# TODO method documentation
 # http://localhost/apps-api/v1/apps/?app-name=appasdas
 # http://localhost:80/apps-api/v1/apps/?app-name=Rolly Legs
 @app.route('/apps-api/v1/apps/')
