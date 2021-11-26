@@ -18,8 +18,9 @@ TO BE DONE
 
 DATE  | AVERAGE UPTIME
 ------------- | -------------
-11/24/2021 |  0
-TBD  |  TBD
+11/24/2021 |  2 HOURS
+11/25/2021 | INTERVIEW DAY - 0 HOUR
+11/26/2021  |  2 HOURS
 
 
 
