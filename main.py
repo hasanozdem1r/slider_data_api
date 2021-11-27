@@ -10,7 +10,7 @@ from datetime import datetime
 
 
 # GET
-# http://localhost:80/apps_api/v1/apps OR http://localhost/apps-api/v1/apps
+# http://localhost/apps-api/v1/apps
 @app.route('/apps-api/v1/apps')  # collection
 def retrieve_app_names():
     """
@@ -72,7 +72,7 @@ def retrieve_images():
 @app.route('/apps-api/v1/apps/id')
 def retrieve_app_id():
     """
-    This method called when user requested http://localhost:80/apps-api/v1/apps/?app-name=Rolly Legs
+    This method called when user requested http://localhost:80/apps-api/v1/apps/id?app-name=Rolly Legs
     This endpoint used to retrieve app_id via app_name
     :return: <json> application id
     """
