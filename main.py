@@ -1,20 +1,22 @@
 # flask related imports
 from app import app
-from flask import jsonify, request
-# api params related helper methods
-from helper import get_application_name, get_application_id, get_add_image_params
+from flask import request
+# api params and response  related helper methods
+from helper import get_application_name, get_application_id, get_add_image_params, prepare_db_related_exception_500, \
+    prepare_query_related_error_400, prepare_response_200, prepare_response_201
 # database related imports
 from model import fetch_data, close_connection, create_record
 from datetime import datetime
 
 
-# This method will be used to retrieve all applications name for drag and drop
-# GET request to ->  http://localhost:80/apps_api/v1/apps OR http://localhost/apps-api/v1/apps
+# GET
+# http://localhost:80/apps_api/v1/apps OR http://localhost/apps-api/v1/apps
 @app.route('/apps-api/v1/apps')  # collection
 def retrieve_app_names():
     """
-    This method will be used to retrieve all applications name for drag and drop
-    :return: <json> Query answer
+    This method called when user requested  http://localhost/apps-api/v1/apps
+    This endpoint used to retrieve all application names
+    :return: <json> list of application names
     """
     try:
         # query and data preparation
@@ -23,28 +25,26 @@ def retrieve_app_names():
         # database crud operations
         db_cursor, connection, query_data = fetch_data(sql_query, query_data)
         close_connection(connection, db_cursor)
-        response = jsonify(query_data)
-        response.status_code = 200
+        # prepare response
+        response = prepare_response_200(query_data)
         return response
+    # database related issue
     except Exception as error:
-        return f'{error}'
+        response = prepare_db_related_exception_500(error)
+        return response
 
 
-
-# This method will be used to retrieve all images path for slider menu
-# GET request to ->  http://localhost:80/apps-api/v1/images?app-id=1
-# http://localhost/apps-api/v1/images?app-id=51
+# GET
+# http://localhost/apps-api/v1/images?app-id=51 or http://localhost:80/apps-api/v1/images?app-id=
 @app.route('/apps-api/v1/images')
 def retrieve_images():
     """
-    This method will be used to retrieve all images path via application id
-    :return: <json> Query answer
+    This method called when user requested http://localhost:80/apps-api/v1/images?app-id=1
+    This endpoint used to retrieve all images path via application id filtering
+    :return: <json> given application images' directories
     """
-    # database operations managed well.
-    # authentication or query parameters passed well
-    # FIXME exception part can be better
     try:
-        # FIXME create else situation things to do
+        # parameter is valid
         if 'app-id' in request.args:
             app_id = get_application_id()
             # query and data preparation
@@ -53,25 +53,31 @@ def retrieve_images():
             # database crud operations
             db_cursor, connection, query_data = fetch_data(sql_query, query_data)
             close_connection(connection, db_cursor)
-            response = jsonify(query_data)
-            response.status_code = 200
+            # response preparation
+            response = prepare_response_200(query_data)
+            return response
+        # parameter is invalid or did not passed
+        else:
+            response = prepare_query_related_error_400()
             return response
     # database related error.
     # authentication or query based reasons
     except Exception as error:
-        return f'{error}'
+        response = prepare_db_related_exception_500(error)
+        return response
 
 
-# TODO method documentation
-# http://localhost/apps-api/v1/apps/?app-name=appasdas
-# http://localhost:80/apps-api/v1/apps/?app-name=Rolly Legs
-@app.route('/apps-api/v1/apps/')
+# GET
+# http://localhost:80/apps-api/v1/apps/id?app-name=Rolly Legs or http://localhost/apps-api/v1/apps/id?app-name=appasdas
+@app.route('/apps-api/v1/apps/id')
 def retrieve_app_id():
-    # database operations managed well.
-    # authentication or query parameters passed well
-    # FIXME exception part can be better
+    """
+    This method called when user requested http://localhost:80/apps-api/v1/apps/?app-name=Rolly Legs
+    This endpoint used to retrieve app_id via app_name
+    :return: <json> application id
+    """
     try:
-        # FIXME create else situation things to do
+        # parameter is valid
         if 'app-name' in request.args:
             app_name = get_application_name()
             # query and data preparation
@@ -80,16 +86,22 @@ def retrieve_app_id():
             # database crud operations
             db_cursor, connection, query_data = fetch_data(sql_query, query_data)
             close_connection(connection, db_cursor)
-            response = jsonify(query_data)
-            response.status_code = 200
+            # prepare response
+            response = prepare_response_200(query_data)
+            return response
+        # parameter is invalid or did not passed
+        else:
+            response = prepare_query_related_error_400()
             return response
     # database related error.
-    # authentication or query based reasons
+    # db authentication or query based reasons
     except Exception as error:
-        return f'{error}'
+        response = prepare_db_related_exception_500(error)
+        return response
 
 
-# http://localhost:80//apps-api/v1/images/post?app-id=41?image-path=asda
+# POST
+# http://localhost:80//apps-api/v1/images/post?app-id=41&image-path=asda
 @app.route('/apps-api/v1/images/post', methods=['POST'])
 def add_image():
     """
@@ -115,7 +127,6 @@ def add_image():
                     # query and data preparation
                     sql_query: str = "INSERT INTO apps_case_study.images (app_id,image_path,created_date,updated_date) \
                                 VALUES(%s,%s,%s,%s);"
-                    current_date = datetime.now()
                     query_data: tuple = (app_id, image_path, str(current_date.strftime('%Y-%m-%d %H:%M:%S')),
                                          str(current_date.strftime('%Y-%m-%d %H:%M:%S')),)
                     # database crud operations
@@ -123,9 +134,7 @@ def add_image():
                     close_connection(connection, db_cursor)
                     # prepare informative json reply
                     informative_msg: dict = {'message': "The image successfully added to database"}
-                    response = jsonify(informative_msg)
-                    # HTTP 201 -> Created
-                    response.status_code = 201
+                    response = prepare_response_201(informative_msg)
                     return response
 
                 # The data is in database
@@ -137,16 +146,18 @@ def add_image():
                     db_cursor, connection = create_record(sql_query, query_data)
                     close_connection(connection, db_cursor)
                     informative_msg: dict = {'message': "The image successfully updated to database"}
-                    response = jsonify(informative_msg)
-                    # HTTP 201 -> Created
-                    response.status_code = 201
+                    response = prepare_response_201(informative_msg)
                     return response
 
             # Parameters are invalid
             else:
-                return 'Parameters are not valid'
+                response = prepare_query_related_error_400()
+                return response
+        # database related error.
+        # db authentication or query based reasons
         except Exception as error:
-            return f'{error}'
+            response = prepare_db_related_exception_500(error)
+            return response
 
 
 if __name__ == '__main__':
