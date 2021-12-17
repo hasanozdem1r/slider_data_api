@@ -1,4 +1,4 @@
-# Software Developer API
+# Slider Data API
 
 This api contains created to manage database operations separately.
 User can have different permissions. 
